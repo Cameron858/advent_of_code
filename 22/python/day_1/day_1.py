@@ -1,30 +1,36 @@
 
 
 def load_input():
+    """Load in the data for Day 1."""
     with open("day_1/22_01.txt") as file_input:
-        lines = file_input.readlines()
+        input_lines = file_input.readlines()
 
-    return lines
+    return input_lines
 
 
 def aoc_1():
-
-    lines = load_input()    
-
-    elfs = []
+    """Calculate the calories per elf."""
+    try:
+        input_lines = load_input()    
+    except OSError as e:
+        print(f"Error {e} raised.")
+        exit()
+    
+    calories_per_elf = []
     sum = 0
-    for value in lines:
+    for value in input_lines:
         if value == '\n':
-            elfs.append(sum)
+            calories_per_elf.append(sum)
             sum = 0
         else:
             calories = int(value)
             sum += calories
     
-    return elfs
+    return calories_per_elf
 
 
 def aoc_1_2():
+    """Sum the max three calories."""
     elfs = aoc_1()
     return sum(sorted(elfs, reverse=True)[0:3])
 
