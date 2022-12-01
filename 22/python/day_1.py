@@ -2,20 +2,20 @@
 
 def load_input():
     """Load in the data for Day 1."""
-    with open(r"22\data\day_1.txt") as file_input:
-        input_lines = file_input.readlines()
+    try:
+        with open(r"22\data\day_1.txt") as file_input:
+            input_lines = file_input.readlines()
+    except OSError as e:
+        print(f"Error {e} raised.")
+        exit()
 
     return input_lines
 
 
 def aoc_1():
     """Calculate the calories per elf."""
-    try:
-        input_lines = load_input()    
-    except OSError as e:
-        print(f"Error {e} raised.")
-        exit()
-    
+    input_lines = load_input()    
+
     calories_per_elf = []
     sum = 0
     for value in input_lines:
