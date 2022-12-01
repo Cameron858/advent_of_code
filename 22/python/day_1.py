@@ -12,7 +12,7 @@ def load_input():
     return input_lines
 
 
-def aoc_1():
+def sum_calories_per_elf():
     """Calculate the calories per elf."""
     input_lines = load_input()    
 
@@ -29,14 +29,14 @@ def aoc_1():
     return calories_per_elf
 
 
-def aoc_1_2():
+def sum_max_three_elfs():
     """Sum the max three calories."""
-    elfs = aoc_1()
+    elfs = sum_calories_per_elf()
     return sum(sorted(elfs, reverse=True)[0:3])
 
 
 if __name__ == '__main__':
 
-    max_elf = max(aoc_1())
-    sum_top_three = aoc_1_2()
+    max_elf = max(sum_calories_per_elf())
+    sum_top_three = sum_max_three_elfs()
     print(f"{max_elf = }, {sum_top_three = }")
