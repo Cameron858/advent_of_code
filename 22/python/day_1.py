@@ -2,7 +2,7 @@
 
 def load_input():
     """Load in the data for Day 1."""
-    with open("day_1/22_01.txt") as file_input:
+    with open(r"22\data\day_1.txt") as file_input:
         input_lines = file_input.readlines()
 
     return input_lines
