@@ -23,10 +23,14 @@ def decode_instructions(input_line: str):
     return procedure
 
 
-def display_stack(stacks):
+def display_stacks(stacks: list[list[str]]):
     for i, s in enumerate(stacks):
         print(i + 1, s)
-    
+
+
+def get_top_crates(stacks: list[list[str]]):
+    for s in stacks:
+        print(s[-1])
 
 def part_1():
 
@@ -56,7 +60,8 @@ def part_1():
             crate = stacks[source_stack - 1].pop()
             stacks[target_stack - 1].append(crate)
     
-    display_stack(stacks)
+    display_stacks(stacks)
+    get_top_crates(stacks)
             
 def part_2():
     input_lines = load_input()[10:]
@@ -90,7 +95,8 @@ def part_2():
         temp.reverse()       
         stacks[target_stack - 1] += temp
     
-    display_stack(stacks)
+    display_stacks(stacks)
+    get_top_crates(stacks)
 
 
 if __name__ == "__main__":
