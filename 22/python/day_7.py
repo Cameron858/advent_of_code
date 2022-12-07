@@ -34,6 +34,9 @@ def get_dir_children(input_lines: list[str], index):
 
 def part_1(input_lines: list[str]):
     
+    max_drive_space = 70_000_000
+    space_needed = 30_000_000
+
     file_tree: dict[list[str]] = {}
     file_path = []
     for index, line in enumerate(input_lines):
@@ -59,10 +62,7 @@ def part_1(input_lines: list[str]):
             elif parts[1] == "cd" and parts[2] == "..":
                 file_path.pop(-1)
     
-    print(file_tree)
-
     print("Calculate sizes")
-
     d = {}
     total_sizes, d = get_size('/', file_tree, d)
     print(d)
@@ -73,6 +73,8 @@ def part_1(input_lines: list[str]):
             part_1_sum += v
 
     print("Part 1: ", part_1_sum)
+
+    return d
 
 def get_size(base_dir: str, file_tree: dict[list[str]], d):
     
@@ -99,6 +101,29 @@ def get_size(base_dir: str, file_tree: dict[list[str]], d):
     return size, d
                 
 
+def part_2(part_1_solution: dict):
+    max_drive_space = 70_000_000
+    space_needed = 30_000_000
+    print(f"{max_drive_space = }")
+    current_used_space = max(part_1_solution.values())
+    print(f"Currently using: {current_used_space}")
+    print(f"Space needed: {space_needed}")
+    left_over_space = max_drive_space - current_used_space
+    print(f"{left_over_space = }")
+    space_difference = space_needed - left_over_space
+    print(f"{space_difference = }")
+
+    possible_dirs = []
+    for k, v in part_1_solution.items():
+
+        if v > space_difference:
+            possible_dirs.append(v)
+    
+    print(possible_dirs)
+    print(min(possible_dirs))
+
+
 if __name__ == "__main__":
     input_ = load_input()
-    part_1(input_)
+    part_1_dict = part_1(input_)
+    part_2(part_1_dict)
