@@ -10,7 +10,7 @@ class LineItemType(Enum):
 def load_input():
     """Load in the data."""
     try:
-        with open(r"22\data\day_7_example.txt") as file_input:
+        with open(r"22\data\day_7.txt") as file_input:
             input_lines = file_input.readlines()
     except OSError as e:
         print(f"Error {e} raised.")
@@ -67,6 +67,12 @@ def part_1(input_lines: list[str]):
     total_sizes, d = get_size('/', file_tree, d)
     print(d)
 
+    part_1_sum = 0
+    for k, v in d.items():
+        if v < 100000:
+            part_1_sum += v
+
+    print("Part 1: ", part_1_sum)
 
 def get_size(base_dir: str, file_tree: dict[list[str]], d):
     
@@ -90,7 +96,6 @@ def get_size(base_dir: str, file_tree: dict[list[str]], d):
     except UnboundLocalError:
         pass
 
-    print(base_dir, size, d)
     return size, d
                 
 
