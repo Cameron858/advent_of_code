@@ -78,11 +78,8 @@ def count_visible_trees(tree_value, tree_list):
 
     for idx, tree in enumerate(tree_list):
         if tree >= tree_value:
-            print(f"{tree_list = }")
-            print(f"return {len(tree_list[:idx]) + 1}")
             return len(tree_list[:idx]) + 1
 
-    print(f"defaut return {len(tree_list)}")
     return len(tree_list)
 
 
@@ -107,26 +104,22 @@ def part_2(input_data):
             # left
             left = separated_input[row][:col]
             left_count = count_visible_trees(tree, left[::-1])
-            print("Left: ", left, left_count)
 
             # right
             right = separated_input[row][col + 1:]
             right_count = count_visible_trees(tree, right)
-            print("Right: ", right, right_count)
         
             # top
             top = []
             for i in range(row - 1, -1, -1):
                 top.append(separated_input[i][col])
             top_count = count_visible_trees(tree, top)
-            print("Top: ", top, top_count)
             
             # bottom
             bottom = []
             for i in range(row + 1, number_of_rows):
                 bottom.append(separated_input[i][col])
             bottom_count = count_visible_trees(tree, bottom)
-            print("Bottom: ", bottom, bottom_count)
             
             s_score = left_count * right_count * top_count * bottom_count
             scenic_scores.append(s_score)
