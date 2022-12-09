@@ -1,3 +1,5 @@
+
+
 def load_input():
     """Load in the data."""
     try:
@@ -51,7 +53,6 @@ class RopeGrid:
         head = self.knots[0]
         head.move((x_diff, y_diff))
 
-
     def record_tail_position(self):
         tail = self.knots[-1]
         self.tail_positions.add((tail.x, tail.y))
@@ -85,35 +86,32 @@ class RopeGrid:
             
             self.record_tail_position()
             print(self.knots)
-            
-
-
-def part_1(input_data):
     
-    grid = RopeGrid(n_knots=10)
+    def simulate(self, data: list[str]):
 
-    for motion in input_data:
-        direction, distance = motion.split(" ")
-        distance = int(distance)
+        for motion in data:
+            direction, distance = motion.split(" ")
+            distance = int(distance)
 
-        for n in range(distance):
-            print(f"Moving {direction} {n + 1}")
+            for n in range(distance):
+                print(f"Moving {direction} {n + 1}")
 
-            if direction == "R":
-                grid.move_head(1, 0)
-            elif direction == "L":
-                grid.move_head(-1, 0)
-            elif direction == "U":
-                grid.move_head(0, 1)                
-            elif direction == "D":
-                grid.move_head(0, -1)
+                if direction == "R":
+                    self.move_head(1, 0)
+                elif direction == "L":
+                    self.move_head(-1, 0)
+                elif direction == "U":
+                    self.move_head(0, 1)                
+                elif direction == "D":
+                    self.move_head(0, -1)
 
-            grid.update_body()
+                self.update_body()
+        
+        print(f"The tail touched {len(self.tail_positions)} unique locations.")
 
-    print(grid.tail_positions)
-    print(len(grid.tail_positions))
 
 if __name__ == "__main__":
 
     data = load_input()
-    part_1(data)
+    grid = RopeGrid(n_knots=10)
+    grid.simulate(data)
