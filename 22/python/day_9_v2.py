@@ -64,9 +64,7 @@ class RopeGrid:
             parent = self.knots[number]
 
             if not knot.is_adjacent(other=parent):
-                print("not adjacent")
                 position_difference = parent - knot
-                print(parent, knot, position_difference)
 
                 try:
                     x_diff = int(position_difference[0] / abs(position_difference[0]))
@@ -78,23 +76,17 @@ class RopeGrid:
                 except ZeroDivisionError:
                     y_diff = 0
                 
-                print(f"{x_diff = }, {y_diff = }")
-
                 knot.move((x_diff, y_diff))
-            else:
-                print("is adjacent")
             
             self.record_tail_position()
-            print(self.knots)
     
-    def simulate(self, data: list[str]):
+    def simulate(self, data: list[str]) -> int:
 
         for motion in data:
             direction, distance = motion.split(" ")
             distance = int(distance)
 
             for n in range(distance):
-                print(f"Moving {direction} {n + 1}")
 
                 if direction == "R":
                     self.move_head(1, 0)
@@ -109,9 +101,28 @@ class RopeGrid:
         
         print(f"The tail touched {len(self.tail_positions)} unique locations.")
 
+        return len(self.tail_positions)
+
 
 if __name__ == "__main__":
 
+    import matplotlib.pyplot as plt
+
     data = load_input()
-    grid = RopeGrid(n_knots=10)
-    grid.simulate(data)
+    
+    positions = []
+    n_knots = []
+    for knots in range(2, 400):
+        print(f"Running simulation for {knots = }")
+        grid = RopeGrid(n_knots=knots)
+        unique_tail_positions = grid.simulate(data)
+        positions.append(unique_tail_positions)
+        n_knots.append(knots)
+
+        if unique_tail_positions == 1:
+            print(f"Tail does not move at {knots} knots.")
+            break
+    
+
+    plt.scatter(x=n_knots, y=positions)
+    plt.show()  
