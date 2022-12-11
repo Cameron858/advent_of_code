@@ -10,36 +10,64 @@ def load_input():
     return [l.strip() for l in input_lines]
 
 
+def get_sprite_positions(x: int) -> tuple[int, int, int]:   
+    return (x - 1, x, x + 2)
+
+
+def display(screen):
+    for r in screen:
+        print(r, end='\n')
+
+
 def part_2(data: list[str]):
 
     x = 1
     row = ''
+    screen: list[str] = []
     signal_strengths: list[int] = []
+    n_40 = 0
 
     cycle_number = 1
     for inst in data:
         
         for cycle in range(2):
-            
+            print(f"{cycle_number=}")
+
             if cycle_number == 20 or (cycle_number - 20) % 40 == 0:
                 print(f"Recording signal strength {cycle_number=}, {x=}, signal_strength={cycle_number*x}")
                 signal_strengths.append(x * cycle_number)
             
+            # has to be below cycle number check for signal strength
             cycle_number += 1
+
+            if cycle_number % 40 == 0:
+                print(f"Creating new row {cycle_number=}, {row}, {len(row)=}")
+
+                assert len(row) == 40
+                screen.append(row)
+                row = ''
+            
+            sprite_pos = get_sprite_positions(x)
+            if cycle_number in sprite_pos:
+                print(f"Cycle {cycle_number} is in sprite positions {x=}, {sprite_pos=}")
+                row += '#'
+            else:
+                row += '.'
 
             if inst == "noop":
                 break
 
-            if inst.startswith("addx"):
-                i, value = inst.split(" ")
-                
-                if cycle == 1:
-                    x += int(value)
+            if inst.startswith("addx") and cycle == 1:
+                _, value = inst.split(" ")
+                x += int(value)
 
+    assert len(screen) == 6
+    display(screen)
 
-    
-    print(signal_strengths, sum(signal_strengths))
+    return sum(signal_strengths)
 
 if __name__ == "__main__":
     data = load_input()
-    part_2(data)
+    signal_sum = part_2(data)
+
+    assert signal_sum == 13140
