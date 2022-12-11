@@ -16,7 +16,7 @@ class Item:
         self.worry_level: int = worry_level
     
     def new_worry_level(self, operator: str, operator_value: int | str):
-        print(f"Calculating new worry level {operator=}, {operator_value=}")
+        # print(f"Calculating new worry level {operator=}, {operator_value=}")
 
         if isinstance(operator_value, int):
             if operator == "*":
@@ -31,11 +31,15 @@ class Item:
         if operator_value == "old":
             self.worry_level *= self.worry_level
         
-        print(f"New worry level is {self.worry_level}")
+        # print(f"New worry level is {self.worry_level}")
     
-    def divide_worry_level(self):
-        self.worry_level = self.worry_level // 3
-        print(f"After dividing my new worry level is {self.worry_level}")
+    def divide_worry_level(self, value=None):
+
+        if value is None:
+            self.worry_level = self.worry_level // 3
+        else:
+            self.worry_level = self.worry_level
+        # print(f"After dividing my new worry level is {self.worry_level}")
     
     def __repr__(self) -> str:
         return f"{self.worry_level}"
@@ -65,22 +69,21 @@ class Monkey:
             for idx, item in enumerate(self.items):
                 self.total_items_inspected += 1
 
-                print(f"Inspecting item {item}")
+                # print(f"Inspecting item {item}")
                 item.new_worry_level(self.operator, self.operation_value)
-                item.divide_worry_level()
+                item.divide_worry_level(value=self.test_value)
 
                 if item.worry_level % self.test_value == 0:
-                    print(f"Test passed, throwing to monkey {self.test_true_monkey}")
+                    # print(f"Test passed, throwing to monkey {self.test_true_monkey}")
                     throw_list.append((idx, self.test_true_monkey))
                 else:
-                    print(f"Test failed, throwing to monkey {self.test_false_monkey}")
+                    # print(f"Test failed, throwing to monkey {self.test_false_monkey}")
                     throw_list.append((idx, self.test_false_monkey))
         
         for _, monkey_id in throw_list:
             item = self.items.pop(0)
             m = Monkey.get_monkey_by_id(monkey_id)
             m.items.append(item)
-
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
@@ -95,11 +98,12 @@ class Monkey:
             raise ValueError(f"No monkey found for {id=}")
     
     @classmethod
-    def print_monkey_inspections(cls):
+    def print_monkey_inspections(cls, round):
 
         inspections = []
         for monkey in Monkey.monkeys:
-            print(f"Monkey {monkey.id} inspected items {monkey.total_items_inspected} times")
+            if round % 1000 == 0:
+                print(f"Monkey {monkey.id} inspected items {monkey.total_items_inspected} times")
             inspections.append(monkey.total_items_inspected)
         
         return inspections
@@ -159,20 +163,24 @@ def part_1(data: list[str]):
         idx += 7
     
     print(Monkey.monkeys)
+    print([m.test_value for m in Monkey.monkeys])
 
-    for round in range(20):
-        print(f"Starting round {round}")
+    for round in range(10_000):
+        print("Round ", round)
+
         for m in Monkey.monkeys:
-            print(m.id)
             m.inspect_items()
         
-        inspections = Monkey.print_monkey_inspections()
-    
+        if round % 1000 == 0:
+            print(f"Round {round}")
+
+        inspections = Monkey.print_monkey_inspections(round)
+
+    inspections = Monkey.print_monkey_inspections(1000)
     print(inspections)
     inspections = sorted(inspections, reverse=True)[0:2] 
     print(inspections)
     print(inspections[0] * inspections[1])
-
 
 
 if __name__ == "__main__":
