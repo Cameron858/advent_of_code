@@ -34,11 +34,7 @@ class Item:
         # print(f"New worry level is {self.worry_level}")
     
     def divide_worry_level(self, value=None):
-
-        if value is None:
-            self.worry_level = self.worry_level // 3
-        else:
-            self.worry_level = self.worry_level
+        self.worry_level = (self.worry_level % 89148)
         # print(f"After dividing my new worry level is {self.worry_level}")
     
     def __repr__(self) -> str:
@@ -82,8 +78,8 @@ class Monkey:
         
         for _, monkey_id in throw_list:
             item = self.items.pop(0)
-            m = Monkey.get_monkey_by_id(monkey_id)
-            m.items.append(item)
+            monkey = Monkey.get_monkey_by_id(monkey_id)
+            monkey.items.append(item)
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
@@ -91,7 +87,6 @@ class Monkey:
     @classmethod
     def get_monkey_by_id(cls, id: int):
         m = [m for m in cls.monkeys if m.id == id]
-
         if m:
             return m[0]
         else:
@@ -110,8 +105,6 @@ class Monkey:
 
 
 def part_1(data: list[str]):
-
-    monkeys: list[Monkey] = []
 
     # parse data
     idx = 0
@@ -166,17 +159,13 @@ def part_1(data: list[str]):
     print([m.test_value for m in Monkey.monkeys])
 
     for round in range(10_000):
-        print("Round ", round)
+        print("Round ", round + 1)
 
         for m in Monkey.monkeys:
             m.inspect_items()
-        
-        if round % 1000 == 0:
-            print(f"Round {round}")
 
-        inspections = Monkey.print_monkey_inspections(round)
+        inspections = Monkey.print_monkey_inspections(round + 1)
 
-    inspections = Monkey.print_monkey_inspections(1000)
     print(inspections)
     inspections = sorted(inspections, reverse=True)[0:2] 
     print(inspections)
