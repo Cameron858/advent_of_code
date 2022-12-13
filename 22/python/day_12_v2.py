@@ -1,4 +1,5 @@
 import string
+import math
 
 
 def load_input():
@@ -11,61 +12,21 @@ def load_input():
         exit()
 
     return input_lines
-
-
-def get_adjacent_positions(check_position: tuple[int, int], max_rows=41, max_cols=95):
-    """
     
-    (20, 0) -> [(19, 0), (20, 1), (21, 0)]
-    """
-    row, col = check_position
-    max_rows -= 1
-    max_cols -= 1
+def find_start_pos(heights: list[list[str]], start_char: str):
+    for ri, r in enumerate(heights):
+        for ci, char in enumerate(r):
+            if char == start_char:
+                return (ri, ci)
 
-    positions = []
-    for r in (row - 1, row + 1):
-        if 0 <= r <= max_rows:
-            positions.append((r, col))
-    
-    for c in (col - 1, col + 1):
-        if 0 <= c <= max_cols:
-            positions.append((row, c))
+def find_end_pos(heights: list[list[str]], end_char: str):
+    for ri, r in enumerate(heights):
+        for ci, char in enumerate(r):
+            if char == end_char:
+                return (ri, ci)
 
-    print(f"Found {positions = } for {check_position = }, ({max_rows=}, {max_cols=})")
-    return positions
-
-
-def get_char(heights: list[list[str]], position: tuple[int, int]):
-    return heights[position[0]][position[1]]
-
-
-def part_1(data: list[str]):
-    
-    number_of_moves = 0
-    locations_visited = set()
-
-    # transform input
-    heights = [[c for c in row.strip()] for row in data]
-    n_rows = len(heights)
-    n_cols = len(heights[0])
-    
-    start_position = (0, 0)
-    end_position = (0, 0)
-    # find start and end point
-    for r_idx, row in enumerate(heights):
-        for c_idx, elevation in enumerate(row):
-
-            if elevation == "S":
-                start_position = (r_idx, c_idx)
-            
-            if elevation == "E":
-                end_position = (r_idx, c_idx)
-    
-    print(f"{start_position = }, {end_position = }")
-
-    character_moves: dict[str, list[str]] = {
-        "S": ['a']
-    }
+def create_char_map() -> dict[str, list[str]]:
+    character_moves = {}
     # map possible positons for each letter
     letters = string.ascii_lowercase
     for index, char in enumerate(letters[0:-1]):
@@ -74,44 +35,143 @@ def part_1(data: list[str]):
         else:
             character_moves[char] = [letters[index - 1], char, letters[index + 1]]
     # add end position to possible move list
-    character_moves["z"] = ['y', 'E']
-    print(character_moves)
+    character_moves["z"] = ['y', 'z']
 
-    path = [start_position]
-    while path:
-        print(f"\n{path = }")
-        position = path.pop(0)
-        number_of_moves += 1
-        current_char = get_char(heights, position)
+    return character_moves
 
-        if position == end_position:
-            print(f"\n\nThe end has been found @ {pos}")
-            print(f"{number_of_moves = }")
-            print(len(locations_visited))
-            exit(0)
+class Node:
+
+    def __init__(self, pos, char: str) -> None:
         
-        print(f"Current position {position}")
-        for pos in get_adjacent_positions(position, n_rows, n_cols):
-            print(f"Checking {pos=}")
-              
-            # check if visited before
-            if pos in locations_visited:
-                print(f"{pos} has been visited")
-                continue
-            
-            # check if valid move
-            if get_char(heights, pos) not in character_moves[current_char]:
-                print(f"{pos} is not a valid move. Tried to move from {current_char} to {get_char(heights, pos)}")
-                continue
-            
-            print(f"Found viable pos {pos}")
-            locations_visited.add(pos)
-            path.append(pos)
+        self.pos = pos
+        self.parent = None
+        self.char = char
+        self.get_valid_chars()
+        
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+    def __repr__(self) -> str:
+        return f"Node({self.pos}, char={self.char}, , valid_chars={self.valid_chars}, g={self.g}, h={self.h}, f={self.f})"
+
+    def get_valid_chars(self):
+        cm = create_char_map()
+        self.valid_chars = cm[self.char]
+
+
+class AStar:
+
+    def __init__(self, maze: list[list[str]], start: tuple[int, int], end: tuple[int, int]) -> None:
+
+        self.maze = maze
+        self.start_position = start
+        self.end_position = end
+
+        self.closed_nodes: list[Node] = []
+        self.open_nodes: list[Node] = []
+        self.path = []
     
-    print(f"The end was not found.")
-    print(f"{number_of_moves = }")
+    def pathfind(self):
+        
+        self.open_nodes.append(Node(pos=self.start_position, char="a"))
+
+        # while self.open_nodes:
+        for _ in range(1000):
+            print("")
+
+            # get the node with the least f value from the open list
+            current_node = self._pop_lowest_f_node_from_open_list()
+            print(f"The current node is {current_node}")
+            self.closed_nodes.append(current_node.pos)
+
+            if current_node.pos == self.end_position:
+                print(f"The end has been found")
+
+                path = []
+                current = current_node
+                while current is not None:
+                    path.append(current.pos)
+                    current = current.parent
+                
+                return path[::-1]
+
+            # get adjacent nodes
+            children = self.get_cardinal_adjacents(node=current_node)
+            print(f"{children=}")
+
+            for child in children:
+
+                child.parent = current_node
+
+                if child.pos in self.closed_nodes:
+                    continue
+                
+                # current_node g + distance from child to current
+                child.g = current_node.g + 1
+                # distance from child to end
+                child.h = int(math.dist(child.pos, self.end_position))
+                child.f = child.g + child.h              
+
+                print(f"Created child node {child}")
+
+                for open_node in self.open_nodes:
+                    if open_node.pos == child.pos and child.g > open_node.g:
+                        continue
+                
+                print(f"Add {child} to open node.")
+                self.open_nodes.append(child)
+
+        return []
+
+    def _pop_lowest_f_node_from_open_list(self) -> Node:
+            
+            lowest_f_cost = self.open_nodes[0].f
+            lowest_f_index = 0
+            for index, node in enumerate(self.open_nodes):
+                if node.f < lowest_f_cost:
+                    lowest_f_cost = node.f
+                    lowest_f_index = index
+            
+            lowest_f_node = self.open_nodes.pop(lowest_f_index)
+            # print(f"Returning lowest f node {lowest_f_node}")
+            return lowest_f_node
     
+    def get_cardinal_adjacents(self, node: Node) -> list[Node]:
+        """
+        (1, 1) -> [(0, 1), (2, 1), (1, 0), (2, 0)]
+        """
+        row, col, = node.pos
+        cardinal_adjacent_positions = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]
+        
+        valid_positions = []
+        for temp_pos in cardinal_adjacent_positions:
+
+            if (0 <= temp_pos[0] < len(self.maze)) and (0 <= temp_pos[1] < len(self.maze[1])):
+                maze_char =  self.maze[temp_pos[0]][temp_pos[1]]
+
+                if maze_char in node.valid_chars:
+                    new_node = Node(pos=temp_pos, char=maze_char)
+                    valid_positions.append(new_node)
+        
+        return valid_positions
+
 
 if __name__ == "__main__":
     data = load_input()
-    part_1(data)
+    data = [[c for c in row.strip()] for row in data]
+    
+    start = find_start_pos(data, "S")
+    end = find_end_pos(data, "E")
+
+    print(f"{start=}, {end=}")
+
+    data[start[0]][start[1]] = "a"
+    data[end[0]][end[1]] = "z"
+
+    valid_moves = create_char_map()
+    print(valid_moves)
+
+    algo = AStar(data, start, end)
+    path = algo.pathfind()
+    print(path, len(path))
