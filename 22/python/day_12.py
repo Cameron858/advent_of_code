@@ -7,7 +7,7 @@ import math
 def load_input():
     """Load in the data."""
     try:
-        with open(r"22\data\day_12_example_1.txt") as file_input:
+        with open(r"22\data\day_12.txt") as file_input:
             input_lines = file_input.readlines()
     except OSError as e:
         print(f"Error {e} raised.")
@@ -81,9 +81,12 @@ def part_1(data: list[str]):
     # map possible positons for each letter
     letters = string.ascii_lowercase
     for index, char in enumerate(letters[0:-1]):
-        character_moves[char] = [char, letters[index + 1]]
+        if index == 0:
+            character_moves[char] = [char, letters[index + 1]]
+        else:
+            character_moves[char] = [letters[index - 1], char, letters[index + 1]]
     # add end position to possible move list
-    character_moves["z"] = ['E']
+    character_moves["z"] = ['y', 'E']
     print(character_moves)
 
 
@@ -94,6 +97,7 @@ def part_1(data: list[str]):
     # for _ in range(10):
 
         locations_visited.append(current_position)
+        print(locations_visited)
 
         print(f"{current_position = }, {current_char = }")
         adjacent_locations = get_adjacent_positions(current_position, n_rows, n_cols)
@@ -121,23 +125,20 @@ def part_1(data: list[str]):
             possible_move_locations = [pos for pos, check in zip(adjacent_locations, is_char_in_move_set) if check]
             print(f"{possible_move_locations = }")
 
-            # try to find one that has not been visited before
-            for pm in possible_move_locations:
-                if pm not in locations_visited:
-                    print(f"Found unvisited location @ {pm}")
-                    current_position = pm
-                    current_char = get_char(heights, current_position)
-                    print(f"Moving to {current_position}, ({current_char})")
-                    break
+            unvisited_locations = [pos for pos in possible_move_locations if pos not in locations_visited]
+            print(f"{unvisited_locations = }")
+
+            if unvisited_locations:
+                current_position = unvisited_locations[-1]
+                current_char = get_char(heights, current_position)
+                print(f"Moving to {current_position}, ({current_char})")
+            else:
+                print(f"Found no unvisited locations")
+                possible_move_locations = sorted(possible_move_locations, key=lambda x: x[1], reverse=True)
+                current_position = locations_visited.pop(-1)
+                current_char = get_char(heights, current_position)
+                print(f"Moving to {current_position}, ({current_char})")
             
-            if current_position == locations_visited[-1]:
-                print(f"No move was made")
-                exit()
-
-            # current_position = random.choice(possible_move_locations)
-            # current_char = get_char(heights, current_position)
-            # print(f"Moving to {current_position}, ({current_char})")
-
         print("")
         number_of_moves += 1
         time.sleep(0)
