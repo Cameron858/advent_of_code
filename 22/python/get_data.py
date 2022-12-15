@@ -14,8 +14,7 @@ def get_day():
     return day
 
 
-def get_data():
-    day = get_day()
+def get_data(day: int):
     cookie = get_session_cookie()
     response = requests.get(f"https://adventofcode.com/2022/day/{day}/input", cookies=cookie)
     print(response)
@@ -26,7 +25,7 @@ def get_data():
 def write_data():
 
     day = get_day()
-    content = get_data()
+    content = get_data(day)
     filename = f"22/data/day_{day}.txt"
 
     with open(filename, "wb") as f:

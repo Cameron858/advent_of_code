@@ -20,7 +20,11 @@ def check_order(v1, v2) -> bool:
             if result:
                 print(f"Inputs {v1_1} and {v2_1} are correctly ordered.")
                 return True
-        
+            elif result is False:
+                return False
+            elif result is None:
+                continue
+            
         print(f"Ran out of list items.")
         if len(v1) < len(v2):
             print(f"Left side ran out of inputs. Returning True")
@@ -38,9 +42,10 @@ def check_order(v1, v2) -> bool:
             print(f"v1 is bigger than v2")
             return False
         else:
-            pass
+            return None
     
     if (isinstance(v1, list) and isinstance(v2, int)):
+        print("v1 is list and v2 is int")
         for v1_1 in v1:
             if check_order(v1_1, v2):
                 return True
@@ -48,6 +53,7 @@ def check_order(v1, v2) -> bool:
                 continue
     
     if (isinstance(v1, int) and isinstance(v2, list)):
+        print("v2 is list and v1 is int")
         for v2_1 in v2:
             if check_order(v1, v2_1):
                 return True

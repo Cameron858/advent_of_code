@@ -5,7 +5,7 @@ import math
 def load_input():
     """Load in the data."""
     try:
-        with open(r"22\data\day_12_example_1.txt") as file_input:
+        with open(r"22\data\day_12.txt") as file_input:
             input_lines = file_input.readlines()
     except OSError as e:
         print(f"Error {e} raised.")
@@ -76,8 +76,8 @@ class AStar:
         
         self.open_nodes.append(Node(pos=self.start_position, char="a"))
 
-        # while self.open_nodes:
-        for _ in range(1000):
+        while self.open_nodes:
+        # for _ in range(1000):
             print("")
 
             # get the node with the least f value from the open list
@@ -122,7 +122,6 @@ class AStar:
                 print(f"Add {child} to open node.")
                 self.open_nodes.append(child)
 
-        return []
 
     def _pop_lowest_f_node_from_open_list(self) -> Node:
             
