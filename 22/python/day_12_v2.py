@@ -13,17 +13,18 @@ def load_input():
 
     return input_lines
     
-def find_start_pos(heights: list[list[str]], start_char: str):
+def find_start_and_end_pos(heights: list[list[str]]):
+    start = None
+    end = None
     for ri, r in enumerate(heights):
         for ci, char in enumerate(r):
-            if char == start_char:
-                return (ri, ci)
+            if char == "S":
+                start = (ri, ci)
+            if char == "E":
+                end = (ri, ci)
+    
+    return start, end
 
-def find_end_pos(heights: list[list[str]], end_char: str):
-    for ri, r in enumerate(heights):
-        for ci, char in enumerate(r):
-            if char == end_char:
-                return (ri, ci)
 
 def create_char_map() -> dict[str, list[str]]:
     character_moves = {}
@@ -77,11 +78,12 @@ class AStar:
         self.open_nodes.append(Node(pos=self.start_position, char="a"))
 
         while self.open_nodes:
-        # for _ in range(1000):
-            print("")
 
             # get the node with the least f value from the open list
-            current_node = self._pop_lowest_f_node_from_open_list()
+            self.open_nodes = sorted(self.open_nodes, key=lambda node: node.f)
+            current_node = self.open_nodes[0]
+            self.open_nodes = self.open_nodes[1:]
+            
             print(f"The current node is {current_node}")
             self.closed_nodes.append(current_node.pos)
 
@@ -95,46 +97,46 @@ class AStar:
                     current = current.parent
                 
                 return path[::-1]
-
+            
             # get adjacent nodes
             children = self.get_cardinal_adjacents(node=current_node)
-            print(f"{children=}")
 
             for child in children:
 
                 child.parent = current_node
 
                 if child.pos in self.closed_nodes:
+                    # print(f"{child} has already been visited")
                     continue
                 
                 # current_node g + distance from child to current
                 child.g = current_node.g + 1
                 # distance from child to end
                 child.h = int(math.dist(child.pos, self.end_position))
+                # child.h = abs(child.pos[0] - self.end_position[0]) + abs(child.pos[1] - self.end_position[1])
                 child.f = child.g + child.h              
-
-                print(f"Created child node {child}")
 
                 for open_node in self.open_nodes:
                     if open_node.pos == child.pos and child.g > open_node.g:
                         continue
-                
-                print(f"Add {child} to open node.")
+
+                # print(f"Add {child} to open node.")
                 self.open_nodes.append(child)
 
 
     def _pop_lowest_f_node_from_open_list(self) -> Node:
-            
-            lowest_f_cost = self.open_nodes[0].f
-            lowest_f_index = 0
-            for index, node in enumerate(self.open_nodes):
-                if node.f < lowest_f_cost:
-                    lowest_f_cost = node.f
-                    lowest_f_index = index
-            
-            lowest_f_node = self.open_nodes.pop(lowest_f_index)
-            # print(f"Returning lowest f node {lowest_f_node}")
-            return lowest_f_node
+        
+        # arbitarily set the lowest f to the f value of the first node
+        lowest_f_cost = self.open_nodes[0].f
+        lowest_f_index = 0
+        for index, node in enumerate(self.open_nodes):
+            if node.f < lowest_f_cost:
+                lowest_f_cost = node.f
+                lowest_f_index = index
+        
+        lowest_f_node = self.open_nodes.pop(lowest_f_index)
+        # print(f"Returning lowest f node {lowest_f_node}")
+        return lowest_f_node
     
     def get_cardinal_adjacents(self, node: Node) -> list[Node]:
         """
@@ -157,19 +159,17 @@ class AStar:
 
 
 if __name__ == "__main__":
+    # p1 > 117
+    # 200 -> error
+    # 250 -> error
     data = load_input()
     data = [[c for c in row.strip()] for row in data]
     
-    start = find_start_pos(data, "S")
-    end = find_end_pos(data, "E")
-
+    start, end = find_start_and_end_pos(data)
     print(f"{start=}, {end=}")
 
     data[start[0]][start[1]] = "a"
     data[end[0]][end[1]] = "z"
-
-    valid_moves = create_char_map()
-    print(valid_moves)
 
     algo = AStar(data, start, end)
     path = algo.pathfind()
