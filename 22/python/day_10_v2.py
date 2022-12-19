@@ -11,7 +11,7 @@ def load_input():
 
 
 def get_sprite_positions(x: int) -> tuple[int, int, int]:   
-    return (x - 1, x, x + 2)
+    return (x - 1, x, x + 1)
 
 
 def display(screen):
@@ -25,7 +25,6 @@ def part_2(data: list[str]):
     row = ''
     screen: list[str] = []
     signal_strengths: list[int] = []
-    n_40 = 0
 
     cycle_number = 1
     for inst in data:
@@ -42,12 +41,11 @@ def part_2(data: list[str]):
 
             if cycle_number % 40 == 0:
                 print(f"Creating new row {cycle_number=}, {row}, {len(row)=}")
-
-                assert len(row) == 40
                 screen.append(row)
                 row = ''
             
             sprite_pos = get_sprite_positions(x)
+            print(f"{sprite_pos=}")
             if cycle_number in sprite_pos:
                 print(f"Cycle {cycle_number} is in sprite positions {x=}, {sprite_pos=}")
                 row += '#'

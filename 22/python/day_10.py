@@ -22,7 +22,7 @@ def display_screen(screen: list[str]) -> None:
 
 
 def get_sprite_positions(x: int) -> tuple[int, int, int]:   
-    return (x - 1, x, x + 2)
+    return (x - 1, x, x + 1)
 
 
 def part_1(data: list[str]):
@@ -83,7 +83,9 @@ def part_1(data: list[str]):
                         print(f"Recording signal strength {cycle_number=}, {x=}, signal_strength={cycle_number*x}")
                         signal_strengths.append(x * cycle_number)
 
-    
+    # 13140 for example, 12540 for actual
+    assert sum(signal_strengths) == 13140
+
     print(f"Recorded signals: {signal_strengths}")
     print(f"Signal sum: {sum(signal_strengths)}")
 
